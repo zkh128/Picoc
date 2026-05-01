@@ -1,40 +1,41 @@
 # PicoC on STM32H750
 
-本项目将 PicoC 移植到 STM32H750，基于 USART1 提供串口交互式 REPL 与整文件加载执行能力，并配套 Windows 上位机工具实现串口连接、源码上传、结果查看与基础测试。目标是以最小可用方案在 MCU 上跑通轻量级 C 脚本解释执行流程。
+中文：本项目将 PicoC 移植到 STM32H750，在 `USART1` 上提供交互式 REPL、整文件上传执行和 Windows 上位机工具，目标是用尽量小的代价跑通 MCU 侧 C 脚本解释工作流。
 
-This project ports PicoC to STM32H750 and provides an interactive UART REPL plus whole-file source upload and execution over USART1, together with a Windows host tool for serial connection, source upload, result viewing, and basic testing. The focus is a minimal and practical embedded C scripting workflow on MCU.
+English: This project ports PicoC to STM32H750 and provides a `USART1`-based REPL, whole-file source upload/execution, and a Windows host tool for a practical embedded C scripting workflow.
 
 ## Features
 
-- PicoC REPL over `USART1`
-- Whole-file upload with `:load / :end / :abort`
-- Basic expression evaluation and multi-line input
-- Windows host tool for serial interaction and upload
-- Keil MDK project for STM32H750
+- Interactive PicoC REPL over `USART1`
+- File upload mode with `:load / :end / :abort`
+- Multi-line source input and whole-file execution
+- STM32H750 Keil MDK project ready for flashing
+- Windows host tool for serial console, file upload, and batch testing
 
 ## Repository Layout
 
-- [Core](F:/work/work/PICO/h750/UART_DMA_H750/Core): STM32 application code
-- [picoc](F:/work/work/PICO/h750/UART_DMA_H750/picoc): PicoC source and STM32 platform port
-- [tools/picoc_host/src](F:/work/work/PICO/h750/UART_DMA_H750/tools/picoc_host/src): Windows host tool source
-- [tools/picoc_host/release/PicoCHost](F:/work/work/PICO/h750/UART_DMA_H750/tools/picoc_host/release/PicoCHost): packaged Windows release
+- [Core](Core): STM32 application code
+- [picoc](picoc): upstream PicoC source plus STM32 platform port
+- [MDK-ARM](MDK-ARM): Keil project files
+- [tools/picoc_host/src](tools/picoc_host/src): host tool source code
+- [tools/picoc_host/src/README.md](tools/picoc_host/src/README.md): host tool usage
+- [docs/移植流程.md](docs/%E7%A7%BB%E6%A4%8D%E6%B5%81%E7%A8%8B.md): porting workflow notes
 
 ## Current Scope
 
-- Script source comes from serial input only
-- No filesystem-backed source loading on target
-- Minimal built-in standard library support
-- Focused on bring-up and practical interaction rather than full desktop PicoC compatibility
+- Script input comes from serial only
+- No target-side filesystem loading
+- Minimal built-in standard library first
+- Focused on stable bring-up and practical interaction
 
-## Build and Run
+## Firmware Quick Start
 
-### Firmware
+1. Open [MDK-ARM/UART_DMA_H750.uvprojx](MDK-ARM/UART_DMA_H750.uvprojx) in Keil MDK.
+2. Build and flash the STM32H750 target.
+3. Open `USART1` at `115200`.
+4. After boot, wait for `picoc> `.
 
-- Open the Keil project under `MDK-ARM`
-- Build and flash the STM32H750 target
-- Connect over `USART1` at `115200`
-
-### Host Tool
+## Host Tool Quick Start
 
 Source mode:
 
@@ -43,10 +44,25 @@ cd tools/picoc_host
 run_host.bat
 ```
 
-Release mode:
+Packaged mode:
 
-- Run `PicoCHost.exe` from `tools/picoc_host/release/PicoCHost`
+- Build with `build_exe.bat`
+- Deliver the whole `tools/picoc_host/release/PicoCHost` folder to other users
+
+## Typical Workflow
+
+1. Connect the board and open the host tool.
+2. Wait for `picoc> `.
+3. For single-line interaction, send expressions or statements directly.
+4. For whole-file execution, enter `:load`, send C source, then send `:end`.
+5. After execution, the target stays in load mode and prints `ready for next file`.
+
+## Notes
+
+- The current board-side upload buffer is RAM-based.
+- This repository keeps source and packaged host-tool output separated.
+- Generated build artifacts and local packaging caches are ignored by Git.
 
 ## License
 
-This repository uses the MIT License. See [LICENSE](F:/work/work/PICO/h750/UART_DMA_H750/LICENSE).
+MIT. See [LICENSE](LICENSE).
